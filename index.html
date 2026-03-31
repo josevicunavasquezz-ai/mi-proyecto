@@ -444,10 +444,7 @@ document.getElementById('upload-form').addEventListener('submit', async function
   if (!nombre) { alert('Por favor ingresa tu nombre.'); return; }
   if (!file)   { alert('Por favor selecciona una foto.'); return; }
   if (file.size > 5 * 1024 * 1024) { alert('La foto es muy grande. El límite es 5 MB.'); return; }
-  if (url.includes('AKfycbxSGbOPUAZYzfu9LpmdHF_oyi_9Z_G2CUW5R3AtrcI6S02Pn-Lk2R9r9PL6vRPaPU_U')) {
-    alert('⚠️ Aún no se ha configurado el script.\nAbre el HTML y reemplaza AKfycbxSGbOPUAZYzfu9LpmdHF_oyi_9Z_G2CUW5R3AtrcI6S02Pn-Lk2R9r9PL6vRPaPU_U con la URL de tu Apps Script.');
-    return;
-  }
+
 
   btn.disabled = true; spinner.style.display = 'block';
   btnText.textContent = 'Enviando...';
