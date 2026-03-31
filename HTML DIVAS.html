@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divas Society — Subir Foto</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:       #0a0e1f;
+    --navy-mid:   #0f1530;
+    --navy-card:  #111828;
+    --navy-light: #1a2240;
+    --gold:       #c9a84c;
+    --gold-light: #e2c47a;
+    --gold-dim:   #7a5e2a;
+    --gold-glow:  rgba(201,168,76,0.15);
+    --gold-border:rgba(201,168,76,0.25);
+    --text:       #f0ead8;
+    --text-muted: #8a8070;
+    --success:    #6fcf97;
+    --error:      #eb5757;
+    --r:          10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ─── Fondo decorativo ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 40% at 50% -5%, rgba(201,168,76,0.12) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 30% at 10% 100%, rgba(201,168,76,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 30% at 90% 95%, rgba(201,168,76,0.06) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* Estrellas decorativas */
+  .star {
+    position: fixed; pointer-events: none; z-index: 0;
+    color: var(--gold-light); font-size: 14px; opacity: 0.4;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  .star:nth-child(2) { top: 8%; left: 8%; animation-delay: .5s; font-size: 10px; }
+  .star:nth-child(3) { top: 15%; right: 10%; animation-delay: 1.2s; }
+  .star:nth-child(4) { top: 5%; left: 50%; animation-delay: .8s; font-size: 10px; }
+  .star:nth-child(5) { top: 22%; left: 18%; animation-delay: 2s; font-size: 8px; }
+  .star:nth-child(6) { top: 18%; right: 22%; animation-delay: 1.7s; font-size: 8px; }
+  @keyframes twinkle { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 48px 0 36px;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .logo-ring {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 90px; height: 90px;
+    border: 1.5px solid var(--gold-border);
+    border-radius: 50%;
+    margin-bottom: 20px;
+    position: relative;
+    background: radial-gradient(circle at center, rgba(201,168,76,0.08) 0%, transparent 70%);
+  }
+  .logo-ring::before {
+    content: '';
+    position: absolute; inset: 5px;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 50%;
+  }
+  .logo-ss {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 600; font-style: italic;
+    background: linear-gradient(135deg, #c9a84c, #e2c47a, #c9a84c);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 300; letter-spacing: .18em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #c9a84c 0%, #e2c47a 50%, #c9a84c 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .brand-sub {
+    font-size: 10px; font-weight: 500; letter-spacing: .35em;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 0 auto 20px;
+    max-width: 280px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+  .divider::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+  .divider-icon { color: var(--gold); font-size: 13px; }
+
+  .tagline {
+    font-size: 13px; font-weight: 300; color: var(--text-muted);
+    letter-spacing: .05em; line-height: 1.6;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    position: relative; z-index: 1;
+    background: var(--navy-card);
+    border: 1px solid var(--gold-border);
+    border-radius: 16px;
+    padding: 40px 36px 44px;
+    width: 100%; max-width: 520px;
+    box-shadow:
+      0 0 0 1px rgba(201,168,76,0.06),
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(201,168,76,0.12);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; font-style: italic;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 12px; color: var(--text-muted); letter-spacing: .04em;
+    margin-bottom: 32px; line-height: 1.6;
+  }
+
+  /* ─── CAMPOS ─── */
+  .field { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: var(--r);
+    color: var(--text);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px; font-weight: 300;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color .25s, box-shadow .25s, background .25s;
+  }
+  input[type="text"]::placeholder, textarea::placeholder { color: rgba(138,128,112,0.5); }
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+  textarea { resize: vertical; min-height: 85px; }
+
+  /* ─── DROPZONE ─── */
+  .dropzone {
+    border: 1.5px dashed rgba(201,168,76,0.2);
+    border-radius: var(--r);
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .3s;
+    position: relative;
+    background: rgba(201,168,76,0.02);
+  }
+  .dropzone:hover, .dropzone.over {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+    box-shadow: 0 0 20px rgba(201,168,76,0.06);
+  }
+  .dropzone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  .drop-camera {
+    width: 40px; height: 40px; margin: 0 auto 12px;
+    border: 1.5px solid var(--gold-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: var(--gold-glow);
+  }
+  .drop-main {
+    font-size: 13px; color: var(--text-muted); font-weight: 300; letter-spacing: .03em;
+  }
+  .drop-main strong { color: var(--gold-light); font-weight: 500; }
+  .drop-hint {
+    font-size: 10px; color: rgba(138,128,112,0.5);
+    margin-top: 5px; letter-spacing: .05em; text-transform: uppercase;
+  }
+
+  /* ─── PREVIEW ─── */
+  #preview-wrap { display: none; margin-top: 14px; }
+  #preview-img {
+    width: 100%; max-height: 220px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--gold-border);
+  }
+  .preview-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px; color: var(--text-muted); letter-spacing: .04em;
+  }
+  .preview-check { color: var(--gold-light); font-size: 13px; }
+
+  /* ─── BARRA DE PROGRESO ─── */
+  .progress-wrap { display: none; margin: 14px 0 4px; }
+  .progress-bar {
+    height: 2px; background: rgba(201,168,76,0.1); border-radius: 1px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold-light));
+    transition: width .35s;
+    border-radius: 1px;
+  }
+  .progress-label {
+    font-size: 10px; color: var(--text-muted); text-align: right;
+    margin-top: 5px; letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  /* ─── BOTÓN ─── */
+  .btn {
+    width: 100%; padding: 15px;
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--r);
+    background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(226,196,122,0.18) 50%, rgba(201,168,76,0.12) 100%);
+    color: var(--gold-light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: .2em; text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all .25s;
+    position: relative; overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(226,196,122,0.28));
+    opacity: 0; transition: opacity .25s;
+  }
+  .btn:hover:not(:disabled)::before { opacity: 1; }
+  .btn:hover:not(:disabled) { border-color: var(--gold); box-shadow: 0 0 20px rgba(201,168,76,0.15); transform: translateY(-1px); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+  /* Spinner dorado */
+  .spinner {
+    width: 14px; height: 14px; display: none;
+    border: 1.5px solid rgba(201,168,76,0.25);
+    border-top-color: var(--gold-light);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── MENSAJES ─── */
+  .msg {
+    display: none; padding: 14px 18px;
+    border-radius: var(--r);
+    font-size: 12px; font-weight: 400;
+    margin-top: 16px; text-align: center;
+    letter-spacing: .04em; line-height: 1.5;
+  }
+  .msg.success {
+    background: rgba(111,207,151,0.07);
+    border: 1px solid rgba(111,207,151,0.25);
+    color: var(--success);
+  }
+  .msg.error {
+    background: rgba(235,87,87,0.07);
+    border: 1px solid rgba(235,87,87,0.25);
+    color: var(--error);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative; z-index: 1;
+    margin-top: 36px;
+    text-align: center;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: rgba(138,128,112,0.35);
+  }
+
+  @media (max-width: 560px) {
+    .card { padding: 32px 22px 36px; }
+    .brand-name { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Estrellas decorativas -->
+<span class="star">✦</span>
+<span class="star">✦</span>
+<span class="star">✦</span>
+<span class="star">✦</span>
+<span class="star">✦</span>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-ring">
+    <span class="logo-ss">SS</span>
+  </div>
+  <div class="brand-name">Divas Society</div>
+  <div class="brand-sub">Creators Agency</div>
+  <div class="divider"><span class="divider-icon">✦</span></div>
+  <p class="tagline">Comparte tus mejores momentos con nuestra comunidad</p>
+</header>
+
+<!-- CARD FORMULARIO -->
+<div class="card">
+  <p class="card-title">Sube tu foto</p>
+  <p class="card-desc">Tu imagen llegará directamente a nuestro equipo. Asegúrate de que sea de buena calidad.</p>
+
+  <!-- ⚠️ REEMPLAZA LA URL con la de tu Apps Script desplegado -->
+  <form id="upload-form" data-url="https://script.google.com/macros/s/PEGA_TU_URL_AQUI/exec">
+
+    <div class="field">
+      <label>Tu nombre</label>
+      <input type="text" id="nombre" placeholder="Ej: Valentina Rodríguez" required>
+    </div>
+
+    <div class="field">
+      <label>Mensaje (opcional)</label>
+      <textarea id="mensaje" placeholder="¿Quieres contarnos algo sobre esta foto?"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Fotografía</label>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" accept="image/*" required>
+        <div class="drop-camera">📷</div>
+        <p class="drop-main">Arrastra aquí o <strong>selecciona tu foto</strong></p>
+        <p class="drop-hint">JPG · PNG · WEBP &nbsp;·&nbsp; Máx 5 MB</p>
+      </div>
+      <div id="preview-wrap">
+        <img id="preview-img" src="" alt="Vista previa">
+        <div class="preview-meta">
+          <span id="preview-name">—</span>
+          <span class="preview-check">✦ Lista para enviar</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <p class="progress-label" id="progress-label">Preparando...</p>
+    </div>
+
+    <button type="submit" class="btn" id="btn-submit">
+      <span class="btn-inner">
+        <span class="spinner" id="spinner"></span>
+        <span id="btn-text">Enviar foto</span>
+      </span>
+    </button>
+
+    <div class="msg success" id="msg-ok">✦ &nbsp; ¡Foto enviada con éxito! La recibimos correctamente.</div>
+    <div class="msg error"   id="msg-err">La foto no pudo enviarse. Por favor intenta nuevamente.</div>
+
+  </form>
+</div>
+
+<footer>© Divas Society Creators Agency &nbsp;·&nbsp; Todos los derechos reservados</footer>
+
+<script>
+const fileInput   = document.getElementById('file-input');
+const dropzone    = document.getElementById('dropzone');
+const previewWrap = document.getElementById('preview-wrap');
+const previewImg  = document.getElementById('preview-img');
+const previewName = document.getElementById('preview-name');
+
+fileInput.addEventListener('change', () => showPreview(fileInput.files[0]));
+dropzone.addEventListener('dragover',  e => { e.preventDefault(); dropzone.classList.add('over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('over');
+  if (e.dataTransfer.files[0]) { fileInput.files = e.dataTransfer.files; showPreview(e.dataTransfer.files[0]); }
+});
+
+function showPreview(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    previewImg.src = e.target.result;
+    previewName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    previewWrap.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('upload-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const url     = this.dataset.url;
+  const nombre  = document.getElementById('nombre').value.trim();
+  const mensaje = document.getElementById('mensaje').value.trim();
+  const file    = fileInput.files[0];
+  const btn     = document.getElementById('btn-submit');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+  const msgOk   = document.getElementById('msg-ok');
+  const msgErr  = document.getElementById('msg-err');
+  const progW   = document.getElementById('progress-wrap');
+  const progF   = document.getElementById('progress-fill');
+  const progL   = document.getElementById('progress-label');
+
+  if (!nombre) { alert('Por favor ingresa tu nombre.'); return; }
+  if (!file)   { alert('Por favor selecciona una foto.'); return; }
+  if (file.size > 5 * 1024 * 1024) { alert('La foto es muy grande. El límite es 5 MB.'); return; }
+  if (url.includes('PEGA_TU_URL_AQUI')) {
+    alert('⚠️ Aún no se ha configurado el script.\nAbre el HTML y reemplaza PEGA_TU_URL_AQUI con la URL de tu Apps Script.');
+    return;
+  }
+
+  btn.disabled = true; spinner.style.display = 'block';
+  btnText.textContent = 'Enviando...';
+  msgOk.style.display = msgErr.style.display = 'none';
+  progW.style.display = 'block'; progF.style.width = '10%';
+  progL.textContent = 'Leyendo imagen...';
+
+  try {
+    const base64 = await fileToBase64(file);
+    progF.style.width = '40%'; progL.textContent = 'Subiendo archivo...';
+
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre, mensaje,
+        imagen: base64.split(',')[1],
+        nombreArchivo: file.name,
+        tipoMime: file.type
+      })
+    });
+
+    progF.style.width = '100%'; progL.textContent = 'Completado';
+    msgOk.style.display = 'block';
+    this.reset();
+    previewWrap.style.display = 'none';
+
+  } catch (err) {
+    console.error(err);
+    msgErr.style.display = 'block';
+    msgErr.textContent = '✕ Error: ' + err.message;
+    progF.style.background = 'var(--error)';
+  } finally {
+    btn.disabled = false; spinner.style.display = 'none';
+    btnText.textContent = 'Enviar foto';
+    setTimeout(() => { progW.style.display = 'none'; progF.style.width = '0%'; progF.style.background = ''; }, 3000);
+  }
+});
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result);
+    r.onerror = () => rej(new Error('No se pudo leer el archivo'));
+    r.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
